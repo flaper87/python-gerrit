@@ -1,6 +1,18 @@
 class Items(list):
     key = None
 
+    def add_flags(self, *flags):
+        """Adds one or more flags to the query.
+
+        For example:
+            current-patch-set -> --current-patch-set
+        """
+        if not isinstance(flags, (list, tuple)):
+            flags = [str(flags)]
+
+        self.extend(["--%s" % f for f in flags])
+        return self
+
     def add_items(self, key, value):
 
         if not isinstance(value, (list, tuple)):

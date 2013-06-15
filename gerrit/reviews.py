@@ -8,7 +8,6 @@ class Query(ssh.Client):
 
     def __init__(self, *args, **kwargs):
         super(Query, self).__init__(*args, **kwargs)
-
         self._filters = filters.Items()
 
     def __iter__(self):
@@ -20,8 +19,6 @@ class Query(ssh.Client):
         query = [
             'gerrit', 'query',
             str(self._filters),
-            '--current-patch-set',
-            '--comments',
             '--format=JSON']
 
         results = self.client.exec_command(' '.join(query))
@@ -30,6 +27,9 @@ class Query(ssh.Client):
         for line in stdout:
             normalized = json.loads(line)
 
+            # Do not return the last item
+            # since it is the summary of
+            # of the query
             if "rowCount" in normalized:
                 raise StopIteration
 
@@ -48,6 +48,73 @@ class Query(ssh.Client):
         self._filters.extend(filters)
         return self
 
-    def limit(self, limit):
-        assert isinstance(limit, int)
-        self._limit = limit
+
+class Review(ssh.Client):
+    """Single review instance.
+
+    This can be used to approve, block or modify
+    a review.
+
+    :params review: The commit sha or review,patch-set
+    to review.
+    """
+    def __init__(self, review, *args, **kwargs):
+        super(Review, self).__init__(*args, **kwargs)
+        self._review = review
+        self._status = None
+        self._verified = None
+        self._code_review = None
+
+    def verify(self, value):
+        """The verification score for this review."""
+        self._verified = value
+
+    def review(self, value):
+        """The score for this review."""
+        self._code_review = value
+
+    def status(self, value):
+        """Sets the status of this review
+
+        Available options are:
+            - restore
+            - abandon
+            - workinprogress
+            - readyforreview
+        """
+        self._status = value
+
+    def commit(self, message=None):
+        """Executes the command
+
+        :params message: The message
+        to use as a comment for this
+        action.
+        """
+
+        flags = filters.Items()
+
+        if self._status:
+            flags.add_flags(self._status)
+
+        if self._code_review is not None:
+            flags.add_flags("code-review %s" % self._code_review)
+
+        if self._verified is not None:
+            flags.add_flags("verified %s" % self._verified)
+
+        if message:
+            flags.add_flags("message '%s'" % message)
+
+        query = ['gerrit', 'review', str(flags), str(self._review)]
+
+        results = self.client.exec_command(' '.join(query))
+        stdin, stdout, stderr = results
+
+        # NOTE(flaper87): Log error messages
+        error = []
+        for line in stderr:
+            error.append(line)
+
+        # True if success
+        return not error
