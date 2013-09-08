@@ -13,17 +13,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 
 import paramiko
 
 
 class Client(object):
 
-    def __init__(self, host, port=29418, user=None, key=None):
+    def __init__(self, host, port=29418, user=None,
+                 key=None, config="~/.ssh/config"):
+
+        self.key = key
         self.host = host
         self.port = port
         self.user = user
-        self.key = key
+
+        config = os.path.expanduser(config)
+        if os.path.exists(config):
+            ssh = paramiko.SSHConfig()
+            ssh.parse(open(config))
+            conf = ssh.lookup(host)
+
+            self.host = conf['hostname']
+            self.port = int(conf.get('port', self.port))
+            self.username = conf.get('user', self.user)
+            self.key = conf.get('identityfile', self.key)
 
     @property
     def client(self):
