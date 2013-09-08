@@ -33,6 +33,7 @@ class Query(ssh.Client):
 
         query = [
             'gerrit', 'query',
+            '--current-patch-set',
             str(self._filters),
             '--format=JSON']
 
