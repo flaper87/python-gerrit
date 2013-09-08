@@ -21,12 +21,12 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name="gerrit",
+    name="python-gerrit",
     version='0.0.1',
     author="Flavio Percoco",
     author_email="flaper87@flaper87.org",
     description=("Gerrit SSH Lib"),
-    license="BSD",
+    license="Apache License v2",
     url="https://github.com/FlaPer87/python-gerrit",
     packages=find_packages('.'),
     include_package_data=True,
