@@ -13,12 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 from setuptools import setup, find_packages
 
-
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
     name="python-gerrit",
@@ -29,8 +25,9 @@ setup(
     license="Apache License v2",
     url="https://github.com/FlaPer87/python-gerrit",
     packages=find_packages('.'),
+    package_data={'': ['LICENSE', 'README.md']},
     include_package_data=True,
-    long_description=read('README.md'),
+    long_description=open('README.md').read(),
     zip_safe=False,
     classifiers=[
         'Intended Audience :: Developers',
