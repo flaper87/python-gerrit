@@ -36,7 +36,7 @@ class Client(object):
 
             self.host = conf['hostname']
             self.port = int(conf.get('port', self.port))
-            self.username = conf.get('user', self.user)
+            self.user = conf.get('user', self.user)
             self.key = conf.get('identityfile', self.key)
 
     @property
