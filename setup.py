@@ -18,7 +18,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="python-gerrit",
-    version='0.0.1',
+    version='0.0.2',
     author="Flavio Percoco",
     author_email="flaper87@flaper87.org",
     description=("Gerrit SSH Lib"),
